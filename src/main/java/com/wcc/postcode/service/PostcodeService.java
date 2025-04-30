@@ -2,8 +2,7 @@
 package com.wcc.postcode.service;
 
 
-import com.wcc.postcode.model.PostcodeDistanceHistory;
-import com.wcc.postcode.model.Postcode;
+import com.wcc.postcode.model.PostcodeGeo;
 import com.wcc.postcode.repository.PostcodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ public class PostcodeService {
     @Autowired
     private PostcodeRepository postcodeRepository;
 
-    public Optional<Postcode> getGeolocation(String postcode) {
+    public Optional<PostcodeGeo> getGeolocation(String postcode) {
         return postcodeRepository.findByPostcode(postcode);
     }
 

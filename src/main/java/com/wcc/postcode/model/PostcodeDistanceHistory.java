@@ -1,8 +1,13 @@
 package com.wcc.postcode.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+@Setter
+@Getter
 @Entity
 @Table(name="postcd_distance_history", indexes = {
         @Index(name="idx_postcode1", columnList="postcode1"),
@@ -10,60 +15,16 @@ import java.time.LocalDate;
 })
 public class PostcodeDistanceHistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     private String postcode1;
+    private double latitude1;
+    private double longitude1;
     private String postcode2;
+    private double latitude2;
+    private double longitude2;
     private double kmDistance;
-    private String createBy;
     private LocalDate createDate;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getPostcode1() {
-        return postcode1;
-    }
-
-    public void setPostcode1(String postcode1) {
-        this.postcode1 = postcode1;
-    }
-
-    public String getPostcode2() {
-        return postcode2;
-    }
-
-    public void setPostcode2(String postcode2) {
-        this.postcode2 = postcode2;
-    }
-
-    public double getKmDistance() {
-        return kmDistance;
-    }
-
-    public void setKmDistance(double kmDistance) {
-        this.kmDistance = kmDistance;
-    }
-
-    public String getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy;
-    }
-
-    public LocalDate getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(LocalDate createDate) {
-        this.createDate = createDate;
-    }
 }

@@ -1,7 +1,7 @@
 package com.wcc.postcode.controller;
 
 
-import com.wcc.postcode.model.Postcode;
+import com.wcc.postcode.model.PostcodeGeo;
 import com.wcc.postcode.model.PostcodeDistanceHistory;
 import com.wcc.postcode.service.PostcodeDistanceHistoryService;
 import com.wcc.postcode.service.PostcodeService;
@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = PostcodeController.BASE_URL)
@@ -43,33 +40,35 @@ public class PostcodeController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     public ResponseEntity<?> getDistance(@PathVariable String postCode1, @PathVariable String postCode2) {
-        Postcode model1;
-        Postcode model2;
+        PostcodeGeo postcodeGeo1;
+        PostcodeGeo postcodeGeo2;
         double distanceKm;
 
         // Query from history table first
+        PostcodeDistanceHistory postcodeDistanceHistory;
         try {
-            PostcodeDistanceHistory postcodeDistanceHistory = postcodeDistanceHistoryService.findByPostcode1AndPostcode2(postCode1, postCode2).orElseThrow();
-            distanceKm = postcodeDistanceHistory.getKmDistance();
+            postcodeDistanceHistory = postcodeDistanceHistoryService.findByPostcode1AndPostcode2(postCode1, postCode2).orElseThrow();
         } catch (Exception e) {
 
             // If not found, then calculate the distance
             try {
-                model1 = postcodeService.getGeolocation(postCode1).orElseThrow();
-                model2 = postcodeService.getGeolocation(postCode2).orElseThrow();
+                postcodeGeo1 = postcodeService.getGeolocation(postCode1).orElseThrow();
+                postcodeGeo2 = postcodeService.getGeolocation(postCode2).orElseThrow();
                 distanceKm = postcodeService.calculateDistance(
-                        model1.getLatitude(),
-                        model1.getLongitude(),
-                        model2.getLatitude(),
-                        model2.getLongitude());
+                        postcodeGeo1.getLatitude(),
+                        postcodeGeo1.getLongitude(),
+                        postcodeGeo2.getLatitude(),
+                        postcodeGeo2.getLongitude());
 
                 // Only update the first time successful calculation into history table
-                PostcodeDistanceHistory postcodeDistanceHistory = new PostcodeDistanceHistory();
-                postcodeDistanceHistory.setPostcode1(postCode1);
-                postcodeDistanceHistory
-                        .setPostcode2(postCode2);
+                postcodeDistanceHistory = new PostcodeDistanceHistory();
+                postcodeDistanceHistory.setPostcode1(postcodeGeo1.getPostcode());
+                postcodeDistanceHistory.setLatitude1(postcodeGeo1.getLatitude());
+                postcodeDistanceHistory.setLongitude1(postcodeGeo1.getLongitude());
+                postcodeDistanceHistory.setPostcode2(postcodeGeo2.getPostcode());
+                postcodeDistanceHistory.setLatitude2(postcodeGeo2.getLatitude());
+                postcodeDistanceHistory.setLongitude2(postcodeGeo2.getLongitude());
                 postcodeDistanceHistory.setKmDistance(distanceKm);
-                postcodeDistanceHistory.setCreateBy("wcc_user");
                 postcodeDistanceHistory.setCreateDate(LocalDate.now());
                 postcodeDistanceHistoryService.save(postcodeDistanceHistory);
 
@@ -78,11 +77,7 @@ public class PostcodeController {
             }
         }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("postalCode1", postCode1);
-        response.put("postalCode2", postCode2);
-        response.put("distanceKm", String.format("%.2f", distanceKm));
-
+        Map<String, Object> response = formatingResponse(postcodeDistanceHistory);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -95,6 +90,28 @@ public class PostcodeController {
     })
     public ResponseEntity<?> getHistory() {
         List<PostcodeDistanceHistory> postcodeDistanceHistoryList = postcodeDistanceHistoryService.findAll();
-        return new ResponseEntity<>(postcodeDistanceHistoryList, HttpStatus.OK);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (PostcodeDistanceHistory postcodeDistanceHistory: postcodeDistanceHistoryList) {
+            result.add(formatingResponse(postcodeDistanceHistory));
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    private Map<String, Object> formatingResponse(PostcodeDistanceHistory postcodeDistanceHistory) {
+        Map<String, Object> response = new HashMap<>();
+        PostcodeGeo from = new PostcodeGeo();
+        from.setPostcode(postcodeDistanceHistory.getPostcode1());
+        from.setLatitude(postcodeDistanceHistory.getLatitude1());
+        from.setLongitude(postcodeDistanceHistory.getLongitude1());
+
+        PostcodeGeo to = new PostcodeGeo();
+        to.setPostcode(postcodeDistanceHistory.getPostcode2());
+        to.setLatitude(postcodeDistanceHistory.getLatitude2());
+        to.setLongitude(postcodeDistanceHistory.getLongitude2());
+
+        response.put("From", from);
+        response.put("To", to);
+        response.put("distanceKm", String.format("%.2f", postcodeDistanceHistory.getKmDistance()) + " km");
+        return response;
     }
 }

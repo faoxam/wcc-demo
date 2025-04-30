@@ -1,8 +1,7 @@
 package com.wcc.postcode.service;
 
-import com.wcc.postcode.model.Postcode;
+import com.wcc.postcode.model.PostcodeGeo;
 import com.wcc.postcode.repository.PostcodeRepository;
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -49,7 +48,7 @@ public class DataImportService {
                     double longitude = Double.parseDouble(record.get("longitude"));
 
                     // You might want to add validation or error handling here
-                    Postcode model = new Postcode();
+                    PostcodeGeo model = new PostcodeGeo();
                     model.setId(id);
                     model.setPostcode(postcode);
                     model.setLatitude(latitude);

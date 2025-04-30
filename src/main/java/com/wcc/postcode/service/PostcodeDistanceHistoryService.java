@@ -1,6 +1,5 @@
 package com.wcc.postcode.service;
 
-import com.wcc.postcode.model.Postcode;
 import com.wcc.postcode.model.PostcodeDistanceHistory;
 import com.wcc.postcode.repository.PostcodeDistanceHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
