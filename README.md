@@ -1,11 +1,20 @@
 # Getting Started
 
-### Install maven
-Follow the official Docker installation guide for your operating system:
+Calculate the geographic (straight line) distance between two postal codes in the UK.
+Display calculation history
+
+Huge records of csv file (ukpostcodes.csv) downloaded from https://www.freemaptools.com/download-uk-postcode-lat-lng.htm
+Import data into mySQL database was automated in this assignment
+
+After successful calculate the distance, the calculation result and postcode details will be stored into table.
+On subsequent request the same input, the result will retrieve from history table instead of new calculation
+
+### Install Maven
+Follow the official Maven installation guide for your operating system:
     https://maven.apache.org/install.html
 
 ### Install JDK 24
-Follow the official Docker installation guide for your operating system:
+Follow the official JDK 24 installation guide for your operating system:
     https://www.oracle.com/my/java/technologies/downloads/
 
 ### Install Docker
