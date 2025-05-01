@@ -61,11 +61,11 @@ The below command must be run at the same folder as pom.xml
    
 `mvn clean install`
 
-3) Run
+2) Run
    
 `mvn spring-boot:run`
 
-5) Testing API
+### Testing API
 The API can be test using swagger by go to the below URL.
 
 http://localhost:8081/swagger-ui/index.html
