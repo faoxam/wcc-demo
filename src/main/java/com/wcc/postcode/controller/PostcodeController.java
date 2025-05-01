@@ -40,6 +40,7 @@ public class PostcodeController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
     })
     public ResponseEntity<?> getDistance(@PathVariable String postCode1, @PathVariable String postCode2) {
+        Map<String, Object> errorResponse = new HashMap<>();
         PostcodeGeo postcodeGeo1;
         PostcodeGeo postcodeGeo2;
         double distanceKm;
@@ -54,6 +55,14 @@ public class PostcodeController {
             try {
                 postcodeGeo1 = postcodeService.getGeolocation(postCode1).orElseThrow();
                 postcodeGeo2 = postcodeService.getGeolocation(postCode2).orElseThrow();
+
+                // Case where both latitude and longitude is 0, mean not yet assigned the value
+                if ((postcodeGeo1.getLatitude() == 0 && postcodeGeo1.getLongitude() == 0) ||
+                        (postcodeGeo2.getLatitude() == 0 && postcodeGeo2.getLongitude() == 0)) {
+                    errorResponse.put("error-message", "One or both postal is valid but yet not defined the coordinate");
+                    errorResponse.put("error-code", HttpStatus.NOT_FOUND);
+                    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+                }
                 distanceKm = postcodeService.calculateDistance(
                         postcodeGeo1.getLatitude(),
                         postcodeGeo1.getLongitude(),
@@ -73,7 +82,9 @@ public class PostcodeController {
                 postcodeDistanceHistoryService.save(postcodeDistanceHistory);
 
             } catch (NoSuchElementException ex) {
-                return new ResponseEntity<>("One or both postal codes could not be found.", HttpStatus.NOT_FOUND);
+                errorResponse.put("error-message", "One or both postal codes could not be found.");
+                errorResponse.put("error-code", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
             }
         }
 

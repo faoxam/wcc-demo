@@ -12,7 +12,7 @@ CREATE TABLE `postcd_geo` (
 ) ;
 
 -- Notes: There is some record having empty latitude and longitude in CSV file
--- This value will be convert to 0 (Or should we exclude this record?)
+-- This value will be convert to 0. Logically 0,0 coordinate was at UK
 SET GLOBAL local_infile=1;
 LOAD DATA INFILE '/var/lib/mysql-files/ukpostcodes.csv'
 INTO TABLE postcd_geo
