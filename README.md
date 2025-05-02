@@ -35,7 +35,7 @@ Follow the official Docker installation guide for your operating system:
 2) Start MsSQL server image
    The initial script to import csv file will be auto execute
    
-   `run --name wcc_mysql2 -p 3306:3306 -d wcc_mysql_app`
+   `docker run --name wcc_mysql2 -p 3306:3306 -d wcc_mysql_app`
    
     ![img_11.png](img_11.png)
 
